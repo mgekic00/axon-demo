@@ -7,3 +7,4 @@
 
 `docker-compose up --build`
 
+Rest endpoints: http://localhost:{port}/api/v1/{url}
