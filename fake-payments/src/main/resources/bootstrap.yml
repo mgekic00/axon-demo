@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: fake-payments
+
+---
+
+# ----------------------------------------
+# Application Config
+# ----------------------------------------
+server:
+  port: 8083
+  servlet:
+    context-path: /api/v1/producer
+---
+
+
+spring:
+  kafka:
+    producer:
+      bootstrap-servers: kafka-2:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
