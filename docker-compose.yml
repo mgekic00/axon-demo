@@ -1,36 +1,9 @@
 version: '3.3'
 services:
-  fake-ledger:
-    container_name: fake-ledger
-    build: ./fake-ledger
-    depends_on:
-    - axonserver-1
-    - kafka
-    ports:
-    - "8080:8080"
-    entrypoint: /bin/sh
-    command: >
-      -c "
-      while ! (nc -z kafka 9092 ); do sleep 5; echo 'Waiting for kafka to start-up...'; done;
-      java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8787,suspend=n -jar /app.jar
-      "
-  fake-payments:
-    container_name: fake-payments
-    build: ./fake-payments
-    depends_on:
-    - axonserver-1
-    - kafka
-    ports:
-    - "8083:8080"
-    entrypoint: /bin/sh
-    command: >
-      -c "
-      while ! (nc -z kafka 9092 ); do sleep 5; echo 'Waiting for kafka to start-up...'; done;
-      java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8787,suspend=n -jar /app.jar
-      "
   axonserver-1:
     image: axoniq/axonserver-enterprise:4.5.9-dev
     hostname: axonserver-1
+    container_name: axonserver-1
     ports:
     - "8024:8024"
     - "8124:8124"
@@ -44,11 +17,10 @@ services:
       target: /axonserver/config/axonserver.token
     environment:
     - AXONIQ_LICENSE=/axonserver/config/axoniq.license
-    networks:
-    - axon
   axonserver-2:
     image: axoniq/axonserver-enterprise:4.5.9-dev
     hostname: axonserver-2
+    container_name: axonserver-2
     ports:
     - "8025:8024"
     - "8125:8124"
@@ -62,11 +34,10 @@ services:
       target: /axonserver/config/axonserver.token
     environment:
     - AXONIQ_LICENSE=/axonserver/config/axoniq.license
-    networks:
-    - axon
   axonserver-3:
     image: axoniq/axonserver-enterprise:4.5.9-dev
     hostname: axonserver-3
+    container_name: axonserver-3
     ports:
     - "8026:8024"
     - "8126:8124"
@@ -80,8 +51,6 @@ services:
       target: /axonserver/config/axonserver.token
     environment:
     - AXONIQ_LICENSE=/axonserver/config/axoniq.license
-    networks:
-    - axon
   zookeeper:
     image: confluentinc/cp-zookeeper:5.0.0
     hostname: zookeeper
@@ -123,5 +92,3 @@ secrets:
     file: ./config/axoniq.license
   axonserver-token:
     file: ./config/axonserver.token
-networks:
-  axon:

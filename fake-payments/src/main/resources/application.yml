@@ -3,8 +3,7 @@ server:
 spring:
   application:
     name: fake-payments
-  kafka:
-    producer:
-      bootstrap-servers: kafka:9092
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+axon:
+  axonserver:
+    context: payments
+    token: 2dfb6d59-72ec-4537-93f8-302111004932

@@ -8,9 +8,14 @@
 
 ### Running Axon Server Enterprise
 
-Please copy axoniq.license to ./config.
-After the cluster is started, create a user by running:
+Please copy axoniq.license to ./config. After the cluster is started, create a user by running:
 
-`./bin/axonserver-cli.jar register-user -t F5B28D72-F0F5-4AD6-A003-99C1BD02830A -u admin -p admin -r ADMIN`
+`./bin/axonserver-cli.jar register-user -t f5b28d72-f0f5-4ad6-a003-99c1bd02830a -u admin -p admin -r ADMIN`
 
-After that you can login to Axonw Server UI by using admin:admin.
+After that you can login to Axon Server UI by using admin:admin.
+
+Then you need to register the applications by running:
+
+`./bin/axonserver-cli.jar register-application -t f5b28d72-f0f5-4ad6-a003-99c1bd02830a -a fake-ledger -r USE_CONTEXT@ledger -T c32eebdf-e82a-4447-8463-c3905d44d2b4`
+
+`./bin/axonserver-cli.jar register-application -t f5b28d72-f0f5-4ad6-a003-99c1bd02830a -a fake-payments -r USE_CONTEXT@payments -T 2dfb6d59-72ec-4537-93f8-302111004932`
