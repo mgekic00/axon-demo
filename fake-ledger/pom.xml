@@ -19,8 +19,11 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>11</java.version>
+    <axon.version>4.5.3</axon.version>
+    <vertx.version>4.1.4</vertx.version>
+    <snowflake.version>1.0.0</snowflake.version>
     <avro.version>1.10.2</avro.version>
-    <rxjava.version>3.1.1</rxjava.version>
+    <jackson.version>2.12.5</jackson.version>
   </properties>
   <dependencies>
     <dependency>
@@ -28,18 +31,24 @@
       <artifactId>spring-boot-starter</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-webflux</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.axonframework</groupId>
       <artifactId>axon-spring-boot-starter</artifactId>
-      <version>4.5.3</version>
+      <version>${axon.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.avro</groupId>
-      <artifactId>avro</artifactId>
-      <version>${avro.version}</version>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-rx-java</artifactId>
+      <version>${vertx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-web</artifactId>
+      <version>${vertx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>xyz.downgoon</groupId>
+      <artifactId>snowflake</artifactId>
+      <version>${snowflake.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.avro</groupId>
@@ -48,17 +57,43 @@
     </dependency>
     <dependency>
       <groupId>org.apache.avro</groupId>
+      <artifactId>avro</artifactId>
+      <version>${avro.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.avro</groupId>
       <artifactId>avro-compiler</artifactId>
       <version>${avro.version}</version>
     </dependency>
     <dependency>
-      <groupId>io.reactivex.rxjava3</groupId>
-      <artifactId>rxjava</artifactId>
-      <version>${rxjava.version}</version>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <version>${jackson.version}</version>
     </dependency>
     <dependency>
-      <groupId>io.projectreactor.addons</groupId>
-      <artifactId>reactor-adapter</artifactId>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-avro</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jdk8</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>${jackson.version}</version>
     </dependency>
   </dependencies>
   <build>

@@ -10,7 +10,7 @@
 
 Please copy axoniq.license to ./config. After the cluster is started, create a user by running:
 
-`./bin/axonserver-cli.jar register-user -t f5b28d72-f0f5-4ad6-a003-99c1bd02830a -u admin -p admin -r ADMIN`
+`./bin/axonserver-cli.jar register-user -t f5b28d72-f0f5-4ad6-a003-99c1bd02830a -u admin -p admin -r ADMIN,USE_CONTEXT@ledger,USE_CONTEXT@payments`
 
 After that you can login to Axon Server UI by using admin:admin.
 
