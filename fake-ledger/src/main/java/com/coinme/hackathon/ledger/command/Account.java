@@ -1,7 +1,5 @@
 package com.coinme.hackathon.ledger.command;
 
-import com.coinme.hackathon.ledger.api.model.AccountCreatedEvent;
-import com.coinme.hackathon.ledger.api.model.CreateAccountCommand;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
