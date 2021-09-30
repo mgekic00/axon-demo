@@ -1,77 +1,94 @@
-version: '3'
+version: '3.3'
 services:
-
-  fake-ledger:
-    container_name: fake-ledger
-    build: ./fake-ledger
-    depends_on:
-      - kafka-2
+  axonserver-1:
+    image: axoniq/axonserver-enterprise:4.5.9-dev
+    hostname: axonserver-1
+    container_name: axonserver-1
     ports:
-      - "8080:8080"
-    entrypoint: /bin/sh
-    command: >
-      -c "
-      while ! (nc -z kafka-2 9092 ); do sleep 5; echo 'Waiting for kafka-2 services to start-up...'; done;
-      java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8787,suspend=n -jar -Dspring.profiles.active=docker /app.jar
-      "
-
-  fake-payments:
-    container_name: fake-payments
-    build: ./fake-payments
-    depends_on:
-      - kafka-2
+    - "8024:8024"
+    - "8124:8124"
+    - "8224:8224"
+    secrets:
+    - source: axoniq-license
+      target: /axonserver/config/axoniq.license
+    - source: axonserver-properties
+      target: /axonserver/config/axonserver.properties
+    - source: axonserver-token
+      target: /axonserver/config/axonserver.token
+    environment:
+    - AXONIQ_LICENSE=/axonserver/config/axoniq.license
+  axonserver-2:
+    image: axoniq/axonserver-enterprise:4.5.9-dev
+    hostname: axonserver-2
+    container_name: axonserver-2
     ports:
-      - "8083:8083"
-    entrypoint: /bin/sh
-    command: >
-      -c "
-      while ! (nc -z kafka-2 9092 ); do sleep 5; echo 'Waiting for kafka-2 services to start-up...'; done;
-      java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8787,suspend=n -jar -Dspring.profiles.active=docker /app.jar
-      "
-
-  zookeeper-2:
+    - "8025:8024"
+    - "8125:8124"
+    - "8225:8224"
+    secrets:
+    - source: axoniq-license
+      target: /axonserver/config/axoniq.license
+    - source: axonserver-properties
+      target: /axonserver/config/axonserver.properties
+    - source: axonserver-token
+      target: /axonserver/config/axonserver.token
+    environment:
+    - AXONIQ_LICENSE=/axonserver/config/axoniq.license
+  axonserver-3:
+    image: axoniq/axonserver-enterprise:4.5.9-dev
+    hostname: axonserver-3
+    container_name: axonserver-3
+    ports:
+    - "8026:8024"
+    - "8126:8124"
+    - "8226:8224"
+    secrets:
+    - source: axoniq-license
+      target: /axonserver/config/axoniq.license
+    - source: axonserver-properties
+      target: /axonserver/config/axonserver.properties
+    - source: axonserver-token
+      target: /axonserver/config/axonserver.token
+    environment:
+    - AXONIQ_LICENSE=/axonserver/config/axoniq.license
+  zookeeper:
     image: confluentinc/cp-zookeeper:5.0.0
-    hostname: zookeeper-2
-    container_name: zookeeper-2
+    hostname: zookeeper
+    container_name: zookeeper
     ports:
-      - "2181:2181"
+    - "2181:2181"
     env_file:
-      - config/zookeeper.env
+    - config/zookeeper.env
     healthcheck:
       test: /bin/sh -c '[ \"imok\" = \"$$(echo ruok | nc -w 1 127.0.0.1 2181)\" ]' || exit 1
       interval: 1m
-    volumes:
-      - zookeeper-2-data:/var/lib/zookeeper/data/
-      - zookeeper-2-log:/var/lib/zookeeper/log/
-
-  kafka-2:
+  kafka:
     image: confluentinc/cp-kafka:5.0.0
-    hostname: kafka-2
-    container_name: kafka-2
+    hostname: kafka
+    container_name: kafka
     stop_grace_period: 5m
     depends_on:
-      - zookeeper-2
+    - zookeeper
     ports:
-      - "9092:9092"
-      - "29092:29092"
+    - "9092:9092"
+    - "29092:29092"
     env_file:
-      - config/kafka.env
-    volumes:
-      - kafka-2-data:/var/lib/kafka/data/
-
-  schema-registry-2:
+    - config/kafka.env
+  schema-registry:
     image: confluentinc/cp-schema-registry:5.0.0
-    hostname: schema-registry-2
-    container_name: schema-registry-2
+    hostname: schema-registry
+    container_name: schema-registry
     depends_on:
-      - zookeeper-2
-      - kafka-2
+    - zookeeper
+    - kafka
     ports:
-      - "8081:8081"
+    - "8081:8081"
     env_file:
-      - config/schema-registry.env
-
-volumes:
-  zookeeper-2-data:
-  zookeeper-2-log:
-  kafka-2-data:
+    - config/schema-registry.env
+secrets:
+  axonserver-properties:
+    file: ./config/axonserver.properties
+  axoniq-license:
+    file: ./config/axoniq.license
+  axonserver-token:
+    file: ./config/axonserver.token

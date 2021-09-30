@@ -1,13 +1,9 @@
 server:
   port: 8080
-
 spring:
   application:
     name: fake-ledger
-  kafka:
-    consumer:
-      bootstrap-servers: kafka-2:9092
-      group-id: group_id
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+axon:
+  axonserver:
+    context: ledger
+    token: c32eebdf-e82a-4447-8463-c3905d44d2b4
