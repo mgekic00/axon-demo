@@ -1,0 +1,14 @@
+@namespace("com.coinme.hackathon.ledger.api.model")
+protocol LedgerApi {
+  record CreateAccountCommand {
+    string id;
+    union{null, string} firstName = null;
+    union{null, string} lastName = null;
+  }
+
+  record AccountCreatedEvent {
+    string id;
+    union{null, string} firstName = null;
+    union{null, string} lastName = null;
+  }
+}
