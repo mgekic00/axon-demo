@@ -1,10 +1,10 @@
-version: '3'
+version: '3.3'
 services:
   fake-ledger:
     container_name: fake-ledger
     build: ./fake-ledger
     depends_on:
-    - axonserver
+    - axonserver-1
     - kafka
     ports:
     - "8080:8080"
@@ -18,7 +18,7 @@ services:
     container_name: fake-payments
     build: ./fake-payments
     depends_on:
-    - axonserver
+    - axonserver-1
     - kafka
     ports:
     - "8083:8080"
@@ -28,17 +28,60 @@ services:
       while ! (nc -z kafka 9092 ); do sleep 5; echo 'Waiting for kafka to start-up...'; done;
       java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8787,suspend=n -jar /app.jar
       "
-  axonserver:
+  axonserver-1:
     image: axoniq/axonserver-enterprise:4.5.9-dev
-    hostname: axonserver
+    hostname: axonserver-1
     ports:
     - "8024:8024"
     - "8124:8124"
     - "8224:8224"
-    volumes:
-    - axonserver-data:/data
-    - axonserver-events:/eventdata
-    - axonserver-config:/config:ro
+    secrets:
+    - source: axoniq-license
+      target: /axonserver/config/axoniq.license
+    - source: axonserver-properties
+      target: /axonserver/config/axonserver.properties
+    - source: axonserver-token
+      target: /axonserver/config/axonserver.token
+    environment:
+    - AXONIQ_LICENSE=/axonserver/config/axoniq.license
+    networks:
+    - axon
+  axonserver-2:
+    image: axoniq/axonserver-enterprise:4.5.9-dev
+    hostname: axonserver-2
+    ports:
+    - "8025:8024"
+    - "8125:8124"
+    - "8225:8224"
+    secrets:
+    - source: axoniq-license
+      target: /axonserver/config/axoniq.license
+    - source: axonserver-properties
+      target: /axonserver/config/axonserver.properties
+    - source: axonserver-token
+      target: /axonserver/config/axonserver.token
+    environment:
+    - AXONIQ_LICENSE=/axonserver/config/axoniq.license
+    networks:
+    - axon
+  axonserver-3:
+    image: axoniq/axonserver-enterprise:4.5.9-dev
+    hostname: axonserver-3
+    ports:
+    - "8026:8024"
+    - "8126:8124"
+    - "8226:8224"
+    secrets:
+    - source: axoniq-license
+      target: /axonserver/config/axoniq.license
+    - source: axonserver-properties
+      target: /axonserver/config/axonserver.properties
+    - source: axonserver-token
+      target: /axonserver/config/axonserver.token
+    environment:
+    - AXONIQ_LICENSE=/axonserver/config/axoniq.license
+    networks:
+    - axon
   zookeeper:
     image: confluentinc/cp-zookeeper:5.0.0
     hostname: zookeeper
@@ -50,9 +93,6 @@ services:
     healthcheck:
       test: /bin/sh -c '[ \"imok\" = \"$$(echo ruok | nc -w 1 127.0.0.1 2181)\" ]' || exit 1
       interval: 1m
-    volumes:
-    - zookeeper-data:/var/lib/zookeeper/data/
-    - zookeeper-log:/var/lib/zookeeper/log/
   kafka:
     image: confluentinc/cp-kafka:5.0.0
     hostname: kafka
@@ -65,8 +105,6 @@ services:
     - "29092:29092"
     env_file:
     - config/kafka.env
-    volumes:
-    - kafka-data:/var/lib/kafka/data/
   schema-registry:
     image: confluentinc/cp-schema-registry:5.0.0
     hostname: schema-registry
@@ -78,15 +116,12 @@ services:
     - "8081:8081"
     env_file:
     - config/schema-registry.env
-volumes:
-  axonserver-data:
-  axonserver-events:
-  axonserver-config:
-    driver: local
-    driver_opts:
-      type: none
-      device: ${PWD}/config
-      o: bind
-  zookeeper-data:
-  zookeeper-log:
-  kafka-data:
+secrets:
+  axonserver-properties:
+    file: ./config/axonserver.properties
+  axoniq-license:
+    file: ./config/axoniq.license
+  axonserver-token:
+    file: ./config/axonserver.token
+networks:
+  axon:
