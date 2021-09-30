@@ -1,77 +1,92 @@
 version: '3'
 services:
-
   fake-ledger:
     container_name: fake-ledger
     build: ./fake-ledger
     depends_on:
-      - kafka-2
+    - axonserver
+    - kafka
     ports:
-      - "8080:8080"
+    - "8080:8080"
     entrypoint: /bin/sh
     command: >
       -c "
-      while ! (nc -z kafka-2 9092 ); do sleep 5; echo 'Waiting for kafka-2 services to start-up...'; done;
-      java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8787,suspend=n -jar -Dspring.profiles.active=docker /app.jar
+      while ! (nc -z kafka 9092 ); do sleep 5; echo 'Waiting for kafka to start-up...'; done;
+      java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8787,suspend=n -jar /app.jar
       "
-
   fake-payments:
     container_name: fake-payments
     build: ./fake-payments
     depends_on:
-      - kafka-2
+    - axonserver
+    - kafka
     ports:
-      - "8083:8083"
+    - "8083:8080"
     entrypoint: /bin/sh
     command: >
       -c "
-      while ! (nc -z kafka-2 9092 ); do sleep 5; echo 'Waiting for kafka-2 services to start-up...'; done;
-      java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8787,suspend=n -jar -Dspring.profiles.active=docker /app.jar
+      while ! (nc -z kafka 9092 ); do sleep 5; echo 'Waiting for kafka to start-up...'; done;
+      java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8787,suspend=n -jar /app.jar
       "
-
-  zookeeper-2:
-    image: confluentinc/cp-zookeeper:5.0.0
-    hostname: zookeeper-2
-    container_name: zookeeper-2
+  axonserver:
+    image: axoniq/axonserver-enterprise:4.5.9-dev
+    hostname: axonserver
     ports:
-      - "2181:2181"
+    - "8024:8024"
+    - "8124:8124"
+    - "8224:8224"
+    volumes:
+    - axonserver-data:/data
+    - axonserver-events:/eventdata
+    - axonserver-config:/config:ro
+  zookeeper:
+    image: confluentinc/cp-zookeeper:5.0.0
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+    - "2181:2181"
     env_file:
-      - config/zookeeper.env
+    - config/zookeeper.env
     healthcheck:
       test: /bin/sh -c '[ \"imok\" = \"$$(echo ruok | nc -w 1 127.0.0.1 2181)\" ]' || exit 1
       interval: 1m
     volumes:
-      - zookeeper-2-data:/var/lib/zookeeper/data/
-      - zookeeper-2-log:/var/lib/zookeeper/log/
-
-  kafka-2:
+    - zookeeper-data:/var/lib/zookeeper/data/
+    - zookeeper-log:/var/lib/zookeeper/log/
+  kafka:
     image: confluentinc/cp-kafka:5.0.0
-    hostname: kafka-2
-    container_name: kafka-2
+    hostname: kafka
+    container_name: kafka
     stop_grace_period: 5m
     depends_on:
-      - zookeeper-2
+    - zookeeper
     ports:
-      - "9092:9092"
-      - "29092:29092"
+    - "9092:9092"
+    - "29092:29092"
     env_file:
-      - config/kafka.env
+    - config/kafka.env
     volumes:
-      - kafka-2-data:/var/lib/kafka/data/
-
-  schema-registry-2:
+    - kafka-data:/var/lib/kafka/data/
+  schema-registry:
     image: confluentinc/cp-schema-registry:5.0.0
-    hostname: schema-registry-2
-    container_name: schema-registry-2
+    hostname: schema-registry
+    container_name: schema-registry
     depends_on:
-      - zookeeper-2
-      - kafka-2
+    - zookeeper
+    - kafka
     ports:
-      - "8081:8081"
+    - "8081:8081"
     env_file:
-      - config/schema-registry.env
-
+    - config/schema-registry.env
 volumes:
-  zookeeper-2-data:
-  zookeeper-2-log:
-  kafka-2-data:
+  axonserver-data:
+  axonserver-events:
+  axonserver-config:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${PWD}/config
+      o: bind
+  zookeeper-data:
+  zookeeper-log:
+  kafka-data:
